@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { showNotification } from "../reducers/notificationReducer";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
-import { BiSad } from "react-icons/bi";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
@@ -20,7 +19,7 @@ import { calculateTimeSince } from "../lib/time";
 
 import { deleteBlog } from "../reducers/blogReducer";
 import { useLike } from "../hooks/useLike";
-import LikeButton from "../components/likeButton";
+import LikeButton from "@/components/LikeButton";
 
 const SingleBlog = () => {
   const [comment, setComment] = useState("");

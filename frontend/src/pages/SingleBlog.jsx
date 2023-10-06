@@ -16,7 +16,7 @@ import {
 } from "../components/ui/card";
 import { Textarea } from "../components/ui/textarea";
 import { calculateTimeSince } from "../lib/time";
-
+import { Link } from "react-router-dom";
 import { deleteBlog } from "../reducers/blogReducer";
 import { useLike } from "../hooks/useLike";
 import LikeButton from "@/components/LikeButton";
@@ -95,16 +95,16 @@ const SingleBlog = () => {
   return (
     <div className="flex flex-col justify-center ">
       <div className="px-8 lg:px-0 lg:w-1/3 mx-auto pt-10">
-        <a
+        <Link
           className="text-4xl font-bold group hover:text-primary/80 transition-all"
-          href={`/users/${blog.user.id}`}
+          to={`/users/${blog.user.id}`}
         >
           Blogpost created By{" "}
           <span className="text-primary group-hover:text-primary/80 transition-all">
             {" "}
             {blog.user.username}
           </span>
-        </a>
+        </Link>
         <div className="">
           <Card className={cn("bg-transparent text-accent w-full border-none")}>
             <CardHeader

@@ -8,6 +8,7 @@ import SingleBlog from "./pages/SingleBlog";
 import Home from "./pages/Home";
 import Users from "./pages/Users";
 import User from "./pages/User";
+import Redirect from "./pages/Redirect";
 
 import Notification from "./components/Notification";
 import NavBar from "./components/NavBar";
@@ -33,21 +34,20 @@ const App = () => {
     <>
       {user.token && <NavBar />}
       <Toaster richColors closeButton theme="dark" />
-
       <Notification />
       <Routes>
-        {!user.token && (
-          <>
-            <Route path="/" element={<LandingPage />} />
-          </>
-        )}
-        {user.token && (
+        {user.token ? (
           <>
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<Users />} />
             <Route path="/users/:id" element={<User />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/blogs/:id" element={<SingleBlog />} />
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/*" element={<Redirect />} />
           </>
         )}
       </Routes>

@@ -125,7 +125,12 @@ const SingleBlog = () => {
               )}
             </CardHeader>
             <CardContent className={cn("flex flex-col gap-y-2 px-0")}>
-              <p>Url: {blog.url}</p>
+              <div className="flex gap-x-2">
+                <span>Url: </span>
+                <Link 
+                className="text-primary hover:text-primary/80 transition-all"
+                to={blog.url}>{blog.url}</Link>
+              </div>
               <LikeButton handleLike={handleLike} likes={likes} />
             </CardContent>
             <CardFooter></CardFooter>

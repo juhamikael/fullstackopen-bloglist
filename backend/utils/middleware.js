@@ -6,7 +6,12 @@ const jwt = require("jsonwebtoken");
 const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
   logger.info("Path:  ", request.path);
-  logger.info("Body:  ", request.body);
+  const bodyClone = { ...request.body };
+
+  if (bodyClone.hasOwnProperty("password")) {
+    bodyClone.password = "**************";
+  }
+  logger.info("Body:  ", bodyClone);
   logger.info("---");
   next();
 };

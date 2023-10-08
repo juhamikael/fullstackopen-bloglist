@@ -1,4 +1,5 @@
 export const commonPasswords = [
+  "yes",
   "password",
   "123456",
   "12345678",

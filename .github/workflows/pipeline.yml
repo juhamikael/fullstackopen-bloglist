@@ -11,28 +11,33 @@ on:
 jobs:
   fullstack:
     runs-on: ubuntu-20.04
-    needs: backend_setup
-    environment: test
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      # Backend Setup
       - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
       - name: Start backend
-        run: npm run start
+        run: npm start &
         env:
           PORT: 3003
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
         working-directory: ./backend
+
+      # Frontend Setup
       - name: Install frontend dependencies
         run: npm install
         working-directory: ./frontend
       - name: Build frontend
         run: npm run build
         working-directory: ./frontend
+
+      # Running tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:

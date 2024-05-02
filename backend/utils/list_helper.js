@@ -1,5 +1,5 @@
 const lodash = require("lodash");
-const logger = require("./logger");
+// const logger = require("./logger");
 
 const dummy = (blogs) => {
   return 1;

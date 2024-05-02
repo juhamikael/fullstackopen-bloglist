@@ -7,7 +7,7 @@ const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
   logger.info("Path:  ", request.path);
   const bodyClone = { ...request.body };
-
+  // eslint-disable-next-line no-prototype-builtins
   if (bodyClone.hasOwnProperty("password")) {
     bodyClone.password = "**************";
   }

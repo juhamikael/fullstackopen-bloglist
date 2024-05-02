@@ -1,6 +1,6 @@
 const Blog = require("../models/blogs");
 const bcrypt = require("bcrypt");
-
+const User = require("../models/user");
 const initialBlogs = [
   {
     title: "React patterns",

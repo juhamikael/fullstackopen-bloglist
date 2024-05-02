@@ -4,13 +4,13 @@ describe("Note ", () => {
       const user = {
         name: "test",
         username: "test",
-        password: "test",
+        password: "testFfqwetqwetqw5324dqwsdfq43test",
       };
 
       const user2 = {
         name: "test2",
         username: "test2",
-        password: "test2",
+        password: "testFfqwetqwetqw5324dqwsdfq43test",
       };
 
       cy.request({

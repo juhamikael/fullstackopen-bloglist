@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  DEFAULT_PORT: 3000 # Default port if not provided by GitHub secrets or environment variables
+  DEFAULT_PORT: ${{ secrets.PORT || '3000' }}
 
 jobs:
   backend_setup:
@@ -23,15 +23,23 @@ jobs:
         run: npm install
         working-directory: ./backend
       - name: Start backend
-        run: npm run start:test > /dev/null 2>&1 &
+        run: npm run start:test > backend.log 2>&1 &
         working-directory: ./backend
+        shell: bash
       - name: Check backend availability
         run: |
           echo "Waiting for backend to be ready..."
-          until curl --output /dev/null --silent --head --fail http://localhost:${{ env.DEFAULT_PORT }}; do
+          timeout=120  # wait for 2 minutes
+          while ! curl --output /dev/null --silent --head --fail http://localhost:${{ env.DEFAULT_PORT }}; do
+            if [ $timeout -le 0 ]; then
+              echo "Backend failed to start in time."
+              exit 1
+            fi
             printf '.'
             sleep 5
+            ((timeout-=5))
           done
+        shell: bash
 
   frontend:
     runs-on: ubuntu-20.04

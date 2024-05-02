@@ -20,8 +20,11 @@ jobs:
       - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
+      - name: List environment variables for debugging
+        run: printenv
+        working-directory: ./backend
       - name: Start backend
-        run: npm run start > backend.log 2>&1 &
+        run: npm run start:test > backend.log 2>&1 &
         env:
           PORT: ${{ secrets.PORT }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}

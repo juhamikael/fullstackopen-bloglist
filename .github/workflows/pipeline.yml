@@ -9,25 +9,7 @@ on:
       - main
 
 jobs:
-  backend_setup:
-    runs-on: ubuntu-20.04
-    environment: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install backend dependencies
-        run: npm install
-        working-directory: ./backend
-      - name: Start backend
-        run: npm run start:test > backend.log 2>&1 &
-        env:
-          PORT: 3003
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-        working-directory: ./backend
-
-  frontend:
+  fullstack:
     runs-on: ubuntu-20.04
     needs: backend_setup
     environment: test
@@ -36,6 +18,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+            - name: Install backend dependencies
+        run: npm install
+        working-directory: ./backend
+      - name: Start backend
+        run: npm run start
+        env:
+          PORT: 3003
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        working-directory: ./backend
       - name: Install frontend dependencies
         run: npm install
         working-directory: ./frontend

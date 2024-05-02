@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "eslint": "eslint './**/*.{js,jsx}'",
     "preview": "vite preview",
     "test": "jest",
     "cypress:open": "cypress open",

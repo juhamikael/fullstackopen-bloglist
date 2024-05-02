@@ -18,7 +18,7 @@ const LikeButton = ({ handleLike, likes }) => {
           <FcLike />
         </div>
       </Button>
-      <div className="flex items-center gap-x-2 text-accent">
+      <div className="flex items-center gap-x-2 text-accent" id="likes-count">
         <AiFillLike /> {likes}
       </div>
     </div>

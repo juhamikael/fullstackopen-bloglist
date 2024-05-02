@@ -49,7 +49,7 @@ const NavBar = () => {
             </Link>
           ))}
           <Dialog>
-            <DialogTrigger>New Blog</DialogTrigger>
+            <DialogTrigger id="new-blog-trigger">New Blog</DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create a new blog</DialogTitle>
@@ -60,11 +60,13 @@ const NavBar = () => {
                 <NewBlog />
               </DialogHeader>
             </DialogContent>
+
           </Dialog>
         </div>
         <div className="flex gap-x-4 items-center lg:absolute lg:right-0 lg:px-8">
           <div className="flex items-center gap-x-2">
             <span
+              id="logged-in-user-name"
               onClick={() =>
                 navigation(`/users/${getUserIdFromToken(user.token)}`)
               }

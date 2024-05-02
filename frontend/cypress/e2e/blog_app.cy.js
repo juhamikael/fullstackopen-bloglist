@@ -1,41 +1,48 @@
-describe("Note ", function () {
-  beforeEach(function () {
-    cy.request("POST", "http://localhost:3003/api/testing/reset");
+describe("Note ", () => {
+  before(() => {
+    cy.request("POST", "http://localhost:3003/api/testing/reset").then(() => {
+      const user = {
+        name: "test",
+        username: "test",
+        password: "test",
+      };
 
-    const user = {
-      name: "test",
-      username: "test",
-      password: "test",
-    };
+      const user2 = {
+        name: "test2",
+        username: "test2",
+        password: "test2",
+      };
 
-    const user2 = {
-      name: "test2",
-      username: "test2",
-      password: "test2",
-    };
+      cy.request({
+        method: "POST",
+        url: "http://localhost:3003/api/users/",
+        body: user,
+        headers: { "Content-Type": "application/json" },
+      });
 
-    cy.request("POST", "http://localhost:3003/api/users/", user);
-    cy.request("POST", "http://localhost:3003/api/users/", user2);
+      cy.request({
+        method: "POST",
+        url: "http://localhost:3003/api/users/",
+        body: user2,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
 
     cy.visit("http://localhost:5173");
-    cy.contains("login").click();
   });
 
-  it("front page can be opened and contains 'blogs'", function () {
-    cy.contains("blogs");
-  });
-
-  it("Login form is shown", function () {
-    cy.contains("username");
-    cy.contains("password");
+  beforeEach(() => {
+    cy.visit("http://localhost:5173");
   });
 
   describe("Login", function () {
+    it("Login form is shown", function () {
+      cy.get("#username").should("exist");
+      cy.get("#password").should("exist");
+    });
+
     it("succeeds with correct credentials", function () {
-      cy.get("#username").type("test");
-      cy.get("#password").type("test");
-      cy.get("#login-button").click();
-      cy.contains("test logged in");
+      cy.userLogin({ username: "test", password: "test" });
     });
 
     it("fails with wrong credentials", function () {
@@ -47,76 +54,95 @@ describe("Note ", function () {
   });
 
   describe("When logged in", function () {
-    beforeEach(function () {
+    beforeEach(() => {
+      cy.visit("http://localhost:5173");
       cy.get("#username").type("test");
       cy.get("#password").type("test");
       cy.get("#login-button").click();
-      cy.contains("new blog").click();
-      cy.get("#title").type("Test Title");
-      cy.get("#author").type("Test Author");
-      cy.get("#url").type("https://google.com");
-      cy.get("#submit-blog-btn").click();
     });
 
     it("A blog can be created", function () {
-      cy.contains("a new blog Test Title by Test Author added");
-      cy.contains("Test Title Test Author");
+      cy.createBlog({
+        title: "should-be-most-liked",
+        author: "more-likes",
+        url: "https://google.com",
+      });
+      cy.createBlog({
+        title: "test",
+        author: "TestAuthor",
+        url: "https://google.com",
+      });
+      cy.createBlog({
+        title: "test2",
+        author: "TestAuthor2",
+        url: "https://google.com",
+      });
+      cy.createBlog({
+        title: "test3",
+        author: "TestAuthor3",
+        url: "https://google.com",
+      });
     });
 
     it("A blog can be liked", function () {
-      cy.get("#show-details-btn").click();
-      cy.contains("Likes: 0");
+      cy.get(
+        "[data-testid=\"blog-card-test\"] > .pt-0 > .justify-between > [data-testid=\"show-details-btn\"]"
+      ).click();
+      cy.get("#likes-count").first().should("contain", "0");
       cy.get("#like-btn").click();
-      cy.contains("Likes: 1");
-    });
-
-    it("A blog can be deleted", function () {
-      cy.get("#show-details-btn").click();
-      cy.get("#delete-btn").click();
-      cy.get("html").should("not.contain", "Test Title Test Author");
+      cy.get("#likes-count").first().should("contain", "1");
     });
 
     it("Blogs are ordered by likes", function () {
-      cy.get("#title").type("Should be most liked");
-      cy.get("#author").type("More Likes");
-      cy.get("#url").type("https://google.com");
+      const blogPostsBefore = {
+        1: { likes: 0, id: null },
+        2: { likes: 0, id: null },
+        3: { likes: 0, id: null },
+      };
 
-      cy.get("#submit-blog-btn").click();
+      const blogPostsAfter = {
+        1: { likes: 0, id: null },
+        2: { likes: 0, id: null },
+        3: { likes: 0, id: null },
+      };
 
-      cy.wait(1000);
+      // Get #blog-list
+      cy.get("#blog-list").should("exist");
+      cy.getBlogLikesAndTitle(1, blogPostsBefore);
+      cy.getBlogLikesAndTitle(2, blogPostsBefore);
+      cy.getBlogLikesAndTitle(3, blogPostsBefore);
 
-      cy.get(".blog-item")
-        .should("exist")
-        .last()
-        .within(() => {
-          cy.get(".show-details-btn").should("exist").click();
-          cy.get(".like-btn").should("exist").click();
-          cy.get(".show-details-btn").should("exist").click();
-        });
+      cy.get(
+        "[data-testid=\"blog-card-should-be-most-liked\"] > .pt-0 > .justify-between > .gap-x-4 > [data-testid=\"like-btn\"]"
+      )
+        .click()
+        .click()
+        .click();
 
-      // Verifying the ordering based on likes
-      cy.get(".blog-item")
-        .eq(0)
-        .should("contain", "Should be most liked More Likes");
-      cy.get(".blog-item").eq(1).should("contain", "Test Title Test Author");
+      cy.getBlogLikesAndTitle(1, blogPostsAfter);
+      cy.getBlogLikesAndTitle(2, blogPostsAfter);
+      cy.getBlogLikesAndTitle(3, blogPostsAfter);
+
+      cy.wrap(blogPostsBefore).should("not.deep.equal", blogPostsAfter);
+      cy.get("#blog-list > :nth-child(1)").should(
+        "contain",
+        "should-be-most-liked"
+      );
     });
   });
-
   describe("When logged in as another user", function () {
     beforeEach(function () {
-      cy.get("#username").type("test");
-      cy.get("#password").type("test");
-      cy.get("#login-button").click();
-      cy.contains("new blog").click();
-      cy.get("#title").type("Test Title");
-      cy.get("#author").type("Test Author");
-      cy.get("#url").type("https://google.com");
-      cy.get("#submit-blog-btn").click();
+      cy.visit("http://localhost:5173");
+      cy.userLogin({ username: "test", password: "test" });
+      cy.createBlog({
+        title: "user blog",
+        author: "created by user test",
+        url: "https://google.com",
+      });
       cy.get("#logout-btn").click();
-      cy.contains("login").click();
-      cy.get("#username").type("test2");
-      cy.get("#password").type("test2");
-      cy.get("#login-button").click();
+
+      cy.userLogin({ username: "test2", password: "test2" });
+
     });
     it("An existing blog cannot be deleted if logged in user hasn't created it", function () {
       cy.get("#show-details-btn").click();

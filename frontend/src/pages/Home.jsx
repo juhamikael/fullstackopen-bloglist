@@ -12,7 +12,7 @@ const Home = () => {
           <h1 className="text-2xl font-black">No blogs found</h1>
         </div>
       )}
-      <div>
+      <div id="blog-list">
         {sortedBlogs.map((blog) => (
           <Blog key={blog.id} blog={blog} />
         ))}

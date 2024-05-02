@@ -7,19 +7,37 @@
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 // ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("createBlog", ({ title, author, url }) => {
+  cy.get("#new-blog-trigger").click();
+  cy.get("#title").type(title);
+  cy.get("#author").type(author);
+  cy.get("#url").type(url);
+  cy.get("#submit-blog-btn").click();
+  cy.get("#close-dialog-btn").click();
+  cy.contains(`a new blog ${title} by ${author} added`);
+  cy.contains(title);
+  cy.contains(author);
+});
+
+Cypress.Commands.add("getBlogLikesAndTitle", (index, blogPosts) => {
+  cy.get(`#blog-list > :nth-child(${index})`).within(() => {
+    cy.get("#likes-count")
+      .invoke("text")
+      .then((text) => {
+        blogPosts[index].likes = parseInt(text);
+      });
+    cy.get("#blog-title")
+      .invoke("text")
+      .then((text) => {
+        blogPosts[index].id = text;
+      });
+  });
+});
+
+Cypress.Commands.add("userLogin", ({ username, password }) => {
+  cy.get("#username").type(username);
+  cy.get("#password").type(password);
+  cy.get("#login-button").click();
+  cy.get("#logged-in-user-name").should("contain", username);
+});

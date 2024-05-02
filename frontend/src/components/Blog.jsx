@@ -19,15 +19,17 @@ const Blog = ({ blog }) => {
   return (
     <div className="flex justify-center pt-10 lg:pt-8">
       <Card
+        id={`blog-card-${blog.id}`}
+        data-testid={`blog-card-${blog.title}`}
         className={cn(
           "bg-transparent border-accent/10 mb-4 rounded-xl items-center md:w-2/3 xl:w-1/3 "
         )}
       >
         <CardHeader>
-          <CardTitle className={cn("text-2xl text-accent")}>
+          <CardTitle className={cn("text-2xl text-accent")} id="blog-title">
             {blog.title}
           </CardTitle>
-          <CardDescription className={cn("text-sm italic")}>
+          <CardDescription className={cn("text-sm italic")} id="blog-author">
             by {blog.author}
           </CardDescription>
         </CardHeader>

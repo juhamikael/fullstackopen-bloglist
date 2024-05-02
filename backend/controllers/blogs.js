@@ -92,7 +92,6 @@ blogRouter.delete(
     const user = request.user;
 
     const blog = await Blog.findById(request.params.id);
-    console.log("Blog from route", blog);
     if (blog.user.toString() !== user._id.toString()) {
       return response.status(401).json({ error: "Unauthorized user" });
     }

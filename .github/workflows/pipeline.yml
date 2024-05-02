@@ -8,16 +8,10 @@ on:
     branches:
       - main
 
-env:
-  DEFAULT_PORT: ${{ secrets.PORT || '3000' }}
-
 jobs:
   backend_setup:
     runs-on: ubuntu-20.04
-    env:
-      NODE_ENV: test
-      PORT: ${{ secrets.PORT || '3000' }}
-      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+    environment: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,11 +37,11 @@ jobs:
             sleep 5
             ((timeout-=5))
           done
-        working-directory: ./backend
 
   frontend:
     runs-on: ubuntu-20.04
     needs: backend_setup
+    environment: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -62,6 +56,6 @@ jobs:
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
-          start: npm run cypress:run
-          wait-on: "http://localhost:${{ env.DEFAULT_PORT }}"
+          start: npm run start-prod
+          wait-on: http://localhost:${{ env.PORT }}
           working-directory: ./frontend

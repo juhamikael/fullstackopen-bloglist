@@ -23,7 +23,7 @@ jobs:
         run: npm install
         working-directory: ./backend
       - name: Start backend
-        run: PORT=${{ env.DEFAULT_PORT }} npm run start:test &
+        run: npm run start:test > /dev/null 2>&1 &
         working-directory: ./backend
       - name: Check backend availability
         run: |

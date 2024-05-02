@@ -20,19 +20,17 @@ jobs:
       - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
-      - name: Log environment variables
-        run: |
-          echo "Port: $PORT"
-        env:
-          PORT: ${{ env.PORT }}
       - name: Start backend
-        run: npm run start
+        run: npm run start > backend.log 2>&1 &
+        env:
+          PORT: ${{ secrets.PORT }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         working-directory: ./backend
       - name: Check backend availability
         run: |
           echo "Waiting for backend to be ready..."
           timeout=120  # wait for 2 minutes
-          while ! curl --output /dev/null --silent --head --fail http://localhost:${{ env.PORT }}; do
+          while ! curl --output /dev/null --silent --head --fail http://localhost:${{ secrets.PORT }}; do
             if [ $timeout -le 0 ]; then
               echo "Backend failed to start in time."
               cat backend.log

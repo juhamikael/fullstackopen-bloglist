@@ -81,4 +81,4 @@ jobs:
           command: npm run cypress:run
           start: " "
           wait-on: http://localhost:5173
-        working-directory: ./frontend
+          working-directory: ./frontend

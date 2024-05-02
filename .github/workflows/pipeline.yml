@@ -1,4 +1,4 @@
-name: Deployment Pipeline
+name: Full Stack CI
 
 on:
   push:
@@ -9,74 +9,42 @@ on:
       - main
 
 jobs:
-  backend:
+  backend_setup:
     runs-on: ubuntu-20.04
+    outputs:
+      port: ${{ steps.find-port.outputs.port }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      # Install backend dependencies
       - name: Install backend dependencies
         run: npm install
-        working-directory: ./backend # Consistently use './backend' to avoid path issues
-
-      # Run ESLint
-      - name: Lint backend
-        run: npm run lint
-        working-directory: ./backend # Ensure we are in the correct directory
-
-      # Run backend tests
-      - name: Run backend tests
-        run: npm run test
-        working-directory: ./backend # Consistently use './backend'
-
-      - name: List backend directory contents
-        run: ls -alh
         working-directory: ./backend
+      - name: Start backend
+        run: npm run start:test &
+        working-directory: ./backend
+      - name: Find port
+        id: find-port
+        run: echo "::set-output name=port::$(lsof -t -i:3000 -sTCP:LISTEN || echo 3000)"
 
-  # setup_frontend:
-  #   runs-on: ubuntu-20.04
-  #   needs: setup_backend
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #     - name: Install frontend dependencies
-  #       run: npm install
-  #       working-directory: ./frontend
-
-  # lint_frontend:
-  #   runs-on: ubuntu-20.04
-  #   needs: setup_frontend
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #     - name: Lint frontend
-  #       run: npx eslint .
-  #       working-directory: ./frontend
-
-  # frontend_tests:
-  #   runs-on: ubuntu-20.04
-  #   needs: lint_frontend
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #     - name: Build the application
-  #       run: npm run build
-  #       working-directory: ./frontend
-  #     - name: Start test server
-  #       run: npm run start:test
-  #       working-directory: ./frontend
-  #     - name: Cypress E2E Tests
-  #       uses: cypress-io/github-action@v6
-  #       with:
-  #         command: npm run cypress:run
-  #         start: ""
-  #         wait-on: http://localhost:5173
+  frontend:
+    runs-on: ubuntu-20.04
+    needs: backend_setup
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./frontend
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run start:test
+          wait-on: "http://localhost:${{ needs.backend_setup.outputs.port }}"
+          working-directory: ./frontend

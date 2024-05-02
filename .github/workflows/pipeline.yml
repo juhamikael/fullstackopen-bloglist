@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: "20"
       - name: Lint backend
-        run: npm run eslint
+        run: npx eslint .
         working-directory: ./backend
 
   lint_frontend:
@@ -53,7 +53,7 @@ jobs:
         with:
           node-version: "20"
       - name: Lint frontend
-        run: npm run eslint
+        run: npx eslint .
         working-directory: ./frontend
 
   backend_tests:

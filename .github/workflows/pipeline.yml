@@ -8,11 +8,12 @@ on:
     branches:
       - main
 
+env:
+  DEFAULT_PORT: 3000 # Default port if not provided by GitHub secrets or environment variables
+
 jobs:
   backend_setup:
     runs-on: ubuntu-20.04
-    outputs:
-      port: ${{ steps.find-port.outputs.port }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,11 +23,15 @@ jobs:
         run: npm install
         working-directory: ./backend
       - name: Start backend
-        run: npm run start:test &
+        run: PORT=${{ env.DEFAULT_PORT }} npm run start:test &
         working-directory: ./backend
-      - name: Find port
-        id: find-port
-        run: echo "::set-output name=port::$(lsof -t -i:3000 -sTCP:LISTEN || echo 3000)"
+      - name: Check backend availability
+        run: |
+          echo "Waiting for backend to be ready..."
+          until curl --output /dev/null --silent --head --fail http://localhost:${{ env.DEFAULT_PORT }}; do
+            printf '.'
+            sleep 5
+          done
 
   frontend:
     runs-on: ubuntu-20.04
@@ -46,5 +51,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: npm run cypress:run
-          wait-on: "http://localhost:${{ needs.backend_setup.outputs.port }}"
+          wait-on: "http://localhost:${{ env.DEFAULT_PORT }}"
           working-directory: ./frontend

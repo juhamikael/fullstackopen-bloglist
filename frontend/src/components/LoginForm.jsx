@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { showNotification } from "../reducers/notificationReducer";
 
-import { login, setUser } from "../reducers/userReducer";
+import { setUser } from "../reducers/userReducer";
 import { cn } from "../lib/utils";
 
 import { useState, useEffect } from "react";
@@ -20,7 +20,15 @@ const LoginForm = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      dispatch(login({ username, password }));
+      const user = await loginService.login({ username, password });
+      dispatch(
+        setUser({
+          username: user.username,
+          name: user.name,
+          token: user.token,
+        })
+      );
+      blogService.setToken(user.token);
       dispatch(
         showNotification(
           `Successfully logged in as ${user.username}`,
@@ -28,11 +36,13 @@ const LoginForm = () => {
           "success"
         )
       );
-
       setUsername("");
       setPassword("");
-    } catch (exception) {
-      dispatch(showNotification("Wrong username or password", 5, "error"));
+
+    } catch (error) {
+      dispatch(
+        showNotification("Wrong credentials, please try again", 5, "error")
+      );
     }
   };
 

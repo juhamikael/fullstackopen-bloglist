@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
 import blogService from "../services/blogs";
+import { setNotification, showNotification } from "./notificationReducer";
 
 const initialState = {
   name: "",
@@ -34,18 +35,19 @@ export const login = ({ username, password }) => {
         password,
       });
       blogService.setToken(user.token);
-      dispatch(
-        setUser({
-          username: user.username,
-          name: user.name,
-          token: user.token,
-        })
-      );
+      dispatch(setUser({
+        username: user.username,
+        name: user.name,
+        token: user.token,
+      }));
     } catch (error) {
-      console.error(error);
+      dispatch(setNotification("Wrong credentials, please try again", 5, "error"));
+      console.error("Login error:", error);
     }
   };
 };
+
+
 
 export const logout = () => {
   return async (dispatch) => {

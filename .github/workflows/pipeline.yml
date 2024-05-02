@@ -1,4 +1,4 @@
-name: Deployment pipeline
+name: Deployment Pipeline
 
 on:
   push:
@@ -9,23 +9,32 @@ on:
       - main
 
 jobs:
-  setup:
+  setup_backend:
     runs-on: ubuntu-20.04
-    outputs:
-      cache-key: ${{ steps.cache-keys.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: npm install
-      - id: cache-keys
-        run: echo "::set-output name=backend::$(echo ${{ hashFiles('backend/package-lock.json') }})"
+        working-directory: ./backend
+
+  setup_frontend:
+    runs-on: ubuntu-20.04
+    needs: setup_backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
 
   lint_backend:
     runs-on: ubuntu-20.04
-    needs: setup
+    needs: setup_backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,7 +46,7 @@ jobs:
 
   lint_frontend:
     runs-on: ubuntu-20.04
-    needs: setup
+    needs: setup_frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -55,7 +64,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm run test
+      - name: Run backend tests
+        run: npm run test
         working-directory: ./backend
 
   frontend_tests:
@@ -66,9 +76,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./frontend
       - name: Build the application
         run: npm run build
         working-directory: ./frontend
@@ -79,6 +86,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           command: npm run cypress:run
-          start: " "
+          start: ""
           wait-on: http://localhost:5173
-          working-directory: ./frontend

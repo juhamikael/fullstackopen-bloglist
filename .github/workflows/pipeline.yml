@@ -45,6 +45,6 @@ jobs:
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
-          start: npm run start:test
+          start: npm run cypress:run
           wait-on: "http://localhost:${{ needs.backend_setup.outputs.port }}"
           working-directory: ./frontend

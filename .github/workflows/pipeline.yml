@@ -20,9 +20,6 @@ jobs:
       - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
-      - name: List environment variables for debugging
-        run: printenv
-        working-directory: ./backend
       - name: Start backend
         run: npm run start:test > backend.log 2>&1 &
         env:
@@ -49,5 +46,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: npm run start-prod
-          wait-on: http://localhost:${{ env.PORT }}
+          wait-on: http://localhost:3003
           working-directory: ./frontend

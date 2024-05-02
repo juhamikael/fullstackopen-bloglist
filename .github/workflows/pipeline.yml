@@ -20,18 +20,16 @@ jobs:
       - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
+      - name: Build
+        run: npm build
+        working-directory: ./backend
       - name: Log environment variables
         run: |
-          echo "Node Environment: $NODE_ENV"
           echo "Port: $PORT"
         env:
-          NODE_ENV: ${{ env.NODE_ENV }}
           PORT: ${{ env.PORT }}
       - name: Start backend
-        run: npm run start:test > backend.log 2>&1 &
-        working-directory: ./backend
-      - name: Output initial backend log
-        run: cat backend.log
+        run: npm run start
         working-directory: ./backend
       - name: Check backend availability
         run: |

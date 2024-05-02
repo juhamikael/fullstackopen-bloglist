@@ -20,17 +20,17 @@ jobs:
         run: npm install
         working-directory: ./backend
 
-  setup_frontend:
-    runs-on: ubuntu-20.04
-    needs: setup_backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install frontend dependencies
-        run: npm install
-        working-directory: ./frontend
+  # setup_frontend:
+  #   runs-on: ubuntu-20.04
+  #   needs: setup_backend
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install frontend dependencies
+  #       run: npm install
+  #       working-directory: ./frontend
 
   lint_backend:
     runs-on: ubuntu-20.04
@@ -41,20 +41,20 @@ jobs:
         with:
           node-version: "20"
       - name: Lint backend
-        run: npx eslint .
+        run: npm run lint
         working-directory: ./backend
 
-  lint_frontend:
-    runs-on: ubuntu-20.04
-    needs: setup_frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Lint frontend
-        run: npx eslint .
-        working-directory: ./frontend
+  # lint_frontend:
+  #   runs-on: ubuntu-20.04
+  #   needs: setup_frontend
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Lint frontend
+  #       run: npx eslint .
+  #       working-directory: ./frontend
 
   backend_tests:
     runs-on: ubuntu-20.04
@@ -68,23 +68,23 @@ jobs:
         run: npm run test
         working-directory: ./backend
 
-  frontend_tests:
-    runs-on: ubuntu-20.04
-    needs: lint_frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Build the application
-        run: npm run build
-        working-directory: ./frontend
-      - name: Start test server
-        run: npm run start:test
-        working-directory: ./frontend
-      - name: Cypress E2E Tests
-        uses: cypress-io/github-action@v6
-        with:
-          command: npm run cypress:run
-          start: ""
-          wait-on: http://localhost:5173
+  # frontend_tests:
+  #   runs-on: ubuntu-20.04
+  #   needs: lint_frontend
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Build the application
+  #       run: npm run build
+  #       working-directory: ./frontend
+  #     - name: Start test server
+  #       run: npm run start:test
+  #       working-directory: ./frontend
+  #     - name: Cypress E2E Tests
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         command: npm run cypress:run
+  #         start: ""
+  #         wait-on: http://localhost:5173

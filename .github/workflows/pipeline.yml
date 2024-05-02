@@ -9,15 +9,31 @@ on:
       - main
 
 jobs:
-  setup_backend:
+  backend:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      # Install backend dependencies
       - name: Install backend dependencies
         run: npm install
+        working-directory: ./backend # Consistently use './backend' to avoid path issues
+
+      # Run ESLint
+      - name: Lint backend
+        run: npm run lint
+        working-directory: ./backend # Ensure we are in the correct directory
+
+      # Run backend tests
+      - name: Run backend tests
+        run: npm run test
+        working-directory: ./backend # Consistently use './backend'
+
+      - name: List backend directory contents
+        run: ls -alh
         working-directory: ./backend
 
   # setup_frontend:
@@ -32,18 +48,6 @@ jobs:
   #       run: npm install
   #       working-directory: ./frontend
 
-  lint_backend:
-    runs-on: ubuntu-20.04
-    needs: setup_backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Lint backend
-        run: npm run lint
-        working-directory: ./backend
-
   # lint_frontend:
   #   runs-on: ubuntu-20.04
   #   needs: setup_frontend
@@ -55,18 +59,6 @@ jobs:
   #     - name: Lint frontend
   #       run: npx eslint .
   #       working-directory: ./frontend
-
-  backend_tests:
-    runs-on: ubuntu-20.04
-    needs: lint_backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Run backend tests
-        run: npm run test
-        working-directory: ./backend
 
   # frontend_tests:
   #   runs-on: ubuntu-20.04
